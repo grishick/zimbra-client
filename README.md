@@ -74,6 +74,51 @@ Following example demonstrates creating a new Zimbra account using zimbra-client
                 });
            }
         });
+        
+### Example 4: Chain domain and account creation ###
+    var ZIMBRA_HOST = "localhost";
+    var ADMIN_LOGIN = "admin";
+    var ADMIN_PWD = "test123";
+    var domain = "testdomain.com";
+    var userEmail = "user1@testdomain.com";
+    zimbra = require("zimbra-client");
+    //get an authtoken
+    zimbra.getAuthToken(ZIMBRA_HOST, ADMIN_LOGIN, ADMIN_PWD,
+    function(err, authToken) {
+        if(err != null) {
+            console.log(err.message);
+        } else {
+            //create a damain using authtoken passed on by getAuthToken
+            zimbra.createDomain(ZIMBRA_HOST, domain, {description:"test domain"}, authToken,
+                function (err1, respObj) {
+                    if (err1 != null) {
+                        if (err1.code == "account.DOMAIN_EXISTS") {
+                            console.log("Domain with this name already exists");
+                        } else {
+                            console.log(err1.message);
+                        }
+                    } else {
+                        console.log("Created domain: " + respObj.name);
+                        //create an account using the same authtoken passed on buy getAuthToken
+                        createAccount(ZIMBRA_HOST,{sn:"Solovyev",givenName:"Greg",displayName:"Greg Solovyev",password:"test123",name:userEmail},authToken,
+                            function(err1,accountObj) {
+                                if(err1 != null) {
+                                    if(err1.code == "account.ACCOUNT_EXISTS") {
+                                        console.log("an account with this name already exists");
+                                    } else
+                                    {
+                                        console.log(err1.message);
+                                    }
+                                } else {
+                                    console.log("new account ID" + accountObj.id);
+                                }
+                            }
+                        );
+                    }
+                });
+        }
+    });
+    
 ## License ##
-zimbra-client is licensed under Apache 2
+zimbra-client is licensed under Apache 2. See LICENSE.txt
 
