@@ -4,6 +4,7 @@
 var request = require('request');
 var js2xmlparser = require('js2xmlparser');
 var ERR_UNKNOWN = "UNKNOWN";
+var USER_AGENT = "zmsoap";
 getAuthToken = function(hostName,adminLogin,adminPassword,cb) {
     var adminURL = getAdminURL(hostName);
     var authRequestObject = {
@@ -15,8 +16,7 @@ getAuthToken = function(hostName,adminLogin,adminPassword,cb) {
             password: adminPassword
         }
     };
-    var req = makeSOAPEnvelope(authRequestObject,"","zmsoap");
-    //console.log("created soap request " + req);
+    var req = makeSOAPEnvelope(authRequestObject,"",USER_AGENT);
     request({
             method:"POST",
             uri:adminURL,
@@ -25,7 +25,7 @@ getAuthToken = function(hostName,adminLogin,adminPassword,cb) {
             },
             body: req,
             strictSSL: false,
-            jar: true,
+            jar: false,
             timeout: 10000
         },
         function(err,resp,body) {
@@ -52,7 +52,7 @@ createAccount = function(hostName, user, adminAuthToken, cb) {
         "CreateAccountRequest":user
     };
     createAccountRequestObj.CreateAccountRequest["@"] = {"xmlns": "urn:zimbraAdmin"};
-    var req = makeSOAPEnvelope(createAccountRequestObj,adminAuthToken,"zmsoap");
+    var req = makeSOAPEnvelope(createAccountRequestObj,adminAuthToken,USER_AGENT);
     request({
             method:"POST",
             uri:adminURL,
@@ -90,7 +90,7 @@ adminRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
     var responseName = requestName.replace("Request","Response");
     wrapperObj[requestName] = reqObject;
     wrapperObj[requestName]["@"] = {"xmlns": "urn:zimbraAdmin"};
-    var req = makeSOAPEnvelope(wrapperObj,adminAuthToken,"zmsoap");
+    var req = makeSOAPEnvelope(wrapperObj,adminAuthToken,USER_AGENT);
     request({
             method:"POST",
             uri:adminURL,
@@ -130,7 +130,7 @@ createDomain = function(hostName, domainName, domainAttrs, adminAuthToken, cb) {
             createDomainObj.CreateDomainRequest.a.push({"@":{"name":name},"#":domainAttrs[name]});
         }
     }
-    var req = makeSOAPEnvelope(createDomainObj,adminAuthToken,"zmsoap");
+    var req = makeSOAPEnvelope(createDomainObj,adminAuthToken,USER_AGENT);
     request({
             method:"POST",
             uri:adminURL,
@@ -200,6 +200,7 @@ function makeSOAPEnvelope(requestObject, authToken, userAgent) {
                         "name":userAgent
                     }
                 },
+                "nosession":"",
                 "format":{
                     "@":{
                         "xmlns":"",
@@ -221,3 +222,6 @@ exports.adminRequest = adminRequest;
 exports.createAccount = createAccount;
 exports.getAuthToken = getAuthToken;
 exports.createDomain = createDomain;
+
+
+
