@@ -3,9 +3,10 @@
 zimbra-client is a Node.js module that implements a SOAP client for Zimbra SOAP API
 
 ## Features ##
-So far this module supports 2 methods
+So far this module supports 3 methods
 * `getAuthToken`
 * `createAccount`
+* `adminRequest`
 
 ## Usage ##
 Following example demonstrates creating a new Zimbra account using zimbra-client. In this example, the code assumes Zimbra is running on localhost, admin username is "admin" and admin password is "test123"
