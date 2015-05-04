@@ -42,11 +42,7 @@ Following example demonstrates creating a new Zimbra account using zimbra-client
             zimbra.adminRequest("localhost", "GetAllAdminAccountsRequest", {}, authToken,
                 function (err1, respObj) {
                     if(err1 != null) {
-                        if(err1.code == "account.ACCOUNT_EXISTS") {
-                            console.log("an account with this name already exists");
-                        } else {
-                            console.log(err1.message);
-                        }
+                        console.log(err1.message);
                     } else {
                         console.log("response object: " + JSON.stringify(respObj));
                     }
