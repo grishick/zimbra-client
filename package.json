@@ -1,0 +1,15 @@
+{
+  "name": "zimbra-client",
+  "version": "0.0.2",
+  "description": "NodeJS client for Zimbra SOAP interface",
+  "main": "index.js",
+  "dependencies": {
+    "request": "*",
+    "js2xmlparser": "*"
+  },
+  "keywords": [
+    "zimbra"
+  ],
+  "author": "Greg Solovyev <fiddlestring@gmail.com> (http://widgeterian.com)",
+  "license": "APACHE LICENSE, VERSION 2.0"
+}
