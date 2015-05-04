@@ -120,6 +120,48 @@ adminRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
         });
 }
 
+createDomain = function(hostName, domainName, domainAttrs, adminAuthToken, cb) {
+    var adminURL = getAdminURL(hostName);
+    var createDomainObj = {"CreateDomainRequest":{name:domainName}};
+    createDomainObj.CreateDomainRequest["@"] = {"xmlns": "urn:zimbraAdmin"};
+    if(domainAttrs != null && domainAttrs.length > 0) {
+        createDomainObj.CreateDomainRequest["a"] = [];
+        for(var name in domainAttrs) {
+            createDomainObj.CreateDomainRequest.a.push({"@":{"name":name},"#":domainAttrs[name]});
+        }
+    }
+    var req = makeSOAPEnvelope(createDomainObj,adminAuthToken,"zmsoap");
+    request({
+            method:"POST",
+            uri:adminURL,
+            headers: {
+                "Content-Type": "application/soap+xml; charset=utf-8"
+            },
+            body: req,
+            strictSSL: false,
+            jar: true,
+            timeout: 10000
+        },
+        function(err,resp,body) {
+            if(err != null) {
+                cb(err,null);
+            } else {
+
+                var result = processResponse(body);
+                if(result.err != null) {
+                    cb(result.err,null);
+                } else if(result.payload.Body.CreateDomainResponse != null &&
+                    result.payload.Body.CreateDomainResponse.domain != null &&
+                    result.payload.Body.CreateDomainResponse.domain[0] != null) {
+                    cb(null,result.payload.Body.CreateDomainResponse.domain[0]);
+                } else {
+                    cb({"message":"Error: could node parse response from Zimbra ","resp":resp,"body":body,code:ERR_UNKNOWN}, null);
+                }
+            }
+
+        });
+}
+
 function processResponse(body) {
     var errcode = ERR_UNKNOWN;
     var respJSON = JSON.parse(body);
@@ -178,3 +220,4 @@ exports.ERR_UNKNOWN = ERR_UNKNOWN;
 exports.adminRequest = adminRequest;
 exports.createAccount = createAccount;
 exports.getAuthToken = getAuthToken;
+exports.createDomain = createDomain;
