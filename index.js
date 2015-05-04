@@ -4,8 +4,7 @@
 var request = require('request');
 var js2xmlparser = require('js2xmlparser');
 var ERR_UNKNOWN = "UNKNOWN";
-exports.ERR_UNKNOWN = ERR_UNKNOWN;
-exports.getAuthToken = function(hostName,adminLogin,adminPassword,cb) {
+getAuthToken = function(hostName,adminLogin,adminPassword,cb) {
     var adminURL = getAdminURL(hostName);
     var authRequestObject = {
         "AuthRequest": {
@@ -47,7 +46,7 @@ exports.getAuthToken = function(hostName,adminLogin,adminPassword,cb) {
         });
 }
 
-exports.createAccount = function(hostName, user, adminAuthToken, cb) {
+createAccount = function(hostName, user, adminAuthToken, cb) {
     var adminURL = getAdminURL(hostName);
     var createAccountRequestObj = {
         "CreateAccountRequest":user
@@ -85,6 +84,42 @@ exports.createAccount = function(hostName, user, adminAuthToken, cb) {
         });
 }
 
+adminRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
+    var adminURL = getAdminURL(hostName);
+    var wrapperObj = {};
+    var responseName = requestName.replace("Request","Response");
+    wrapperObj[requestName] = reqObject;
+    wrapperObj[requestName]["@"] = {"xmlns": "urn:zimbraAdmin"};
+    var req = makeSOAPEnvelope(wrapperObj,adminAuthToken,"zmsoap");
+    request({
+            method:"POST",
+            uri:adminURL,
+            headers: {
+                "Content-Type": "application/soap+xml; charset=utf-8"
+            },
+            body: req,
+            strictSSL: false,
+            jar: true,
+            timeout: 10000
+        },
+        function(err,resp,body) {
+            if(err != null) {
+                cb(err,null);
+            } else {
+
+                var result = processResponse(body);
+                if(result.err != null) {
+                    cb(result.err,null);
+                } else if(result.payload.Body[responseName] != null) {
+                    cb(null,result.payload.Body[responseName]);
+                } else {
+                    cb({"message":"Error: could node parse response from Zimbra ","resp":resp,"body":body,code:ERR_UNKNOWN}, null);
+                }
+            }
+
+        });
+}
+
 function processResponse(body) {
     var errcode = ERR_UNKNOWN;
     var respJSON = JSON.parse(body);
@@ -106,6 +141,7 @@ function processResponse(body) {
 function getAdminURL(hostName) {
     return "https://" + hostName + ":7071/service/admin/soap";
 }
+
 function makeSOAPEnvelope(requestObject, authToken, userAgent) {
     var soapReq = {
         "@":{
@@ -135,3 +171,10 @@ function makeSOAPEnvelope(requestObject, authToken, userAgent) {
     return js2xmlparser("soap:Envelope",soapReq);
 }
 
+/**
+ * All module exports are declared below this line
+ */
+exports.ERR_UNKNOWN = ERR_UNKNOWN;
+exports.adminRequest = adminRequest;
+exports.createAccount = createAccount;
+exports.getAuthToken = getAuthToken;

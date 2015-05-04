@@ -1,6 +1,7 @@
 {
   "name": "zimbra-client",
-  "version": "0.0.2",
+  "private": false,
+  "version": "0.0.3",
   "description": "NodeJS client for Zimbra SOAP interface",
   "main": "index.js",
   "dependencies": {
@@ -10,6 +11,10 @@
   "keywords": [
     "zimbra"
   ],
+  "repository" : {
+    "type":    "git",
+    "url":     "git://github.com/grishick/zimbra-client.git"
+  },
   "author": "Greg Solovyev <fiddlestring@gmail.com> (http://widgeterian.com)",
   "license": "APACHE LICENSE, VERSION 2.0"
 }
