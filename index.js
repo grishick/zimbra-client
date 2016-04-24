@@ -85,12 +85,21 @@ createAccount = function(hostName, user, adminAuthToken, cb) {
 }
 
 adminRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
-    var adminURL = getAdminURL(hostName);
+        var adminURL = getAdminURL(hostName);
     var wrapperObj = {};
-    var responseName = requestName.replace("Request","Response");
+    var responseName = requestName.replace("Request", "Response");
     wrapperObj[requestName] = reqObject;
-    wrapperObj[requestName]["@"] = {"xmlns": "urn:zimbraAdmin"};
-    var req = makeSOAPEnvelope(wrapperObj,adminAuthToken,USER_AGENT);
+
+    var defaultRequestAttribute = { "xmlns": "urn:zimbraAdmin" };
+
+    if (wrapperObj[requestName]["@"]) {
+        for (var attrname in defaultRequestAttribute) {
+            wrapperObj[requestName]["@"][attrname] = defaultRequestAttribute[attrname];
+        }
+    }else{
+         wrapperObj[requestName]["@"] = defaultRequestAttribute;
+    }
+
     request({
             method:"POST",
             uri:adminURL,
