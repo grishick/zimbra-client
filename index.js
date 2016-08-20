@@ -328,15 +328,3 @@ exports.createAccount = createAccount;
 exports.getAuthToken = getAuthToken;
 exports.createDomain = createDomain;
 
-
-
-/*
-html:
- {"Header":{"context":{"_jsns":"urn:zimbra","userAgent":{"name":"ZimbraWebClient - GC42 (Mac)","version":"8.6.0_GA_1169"},"session":{"_content":124909,"id":124909},"notify":{"seq":19},"account":{"_content":"greg@zimbra.com","by":"name"},"csrfToken":"0_1f9ba47d2de9159879371451a6ae15dc3ffa8814"}},"Body":{"SendMsgRequest":{"_jsns":"urn:zimbraMail","suid":1430804429828,"m":{"idnt":"73230d32-6664-11d9-859e-f139bc5db393","e":[{"t":"t","a":"fiddlestring@gmail.com"},{"t":"f","a":"greg@zimbra.com","p":"Greg Solovyev"}],"su":{"_content":"test"},"mp":[{"ct":"multipart/alternative","mp":[{"ct":"text/plain","content":{"_content":"test \n\nThanks, \nGreg \n"}},{"ct":"text/html","content":{"_content":"<html><body><div style=\"font-family: Arial; font-size: 12pt; color: #000000\"><div>test</div><div><br></div><div data-marker=\"__SIG_PRE__\">Thanks,<br>Greg</div></div></body></html>"}}]}]}}}}
-
-plain text:
- {"Header":{"context":{"_jsns":"urn:zimbra","userAgent":{"name":"ZimbraWebClient - GC42 (Mac)","version":"8.6.0_GA_1169"},"session":{"_content":124909,"id":124909},"notify":{"seq":23},"account":{"_content":"greg@zimbra.com","by":"name"},"csrfToken":"0_1f9ba47d2de9159879371451a6ae15dc3ffa8814"}},"Body":{"SendMsgRequest":{"_jsns":"urn:zimbraMail","suid":1430805301701,"m":{"idnt":"73230d32-6664-11d9-859e-f139bc5db393","e":[{"t":"t","a":"grishick@yahoo.com"},{"t":"f","a":"greg@zimbra.com","p":"Greg Solovyev"}],"su":{"_content":"plain text test"},"mp":[{"ct":"text/plain","content":{"_content":"this is plain text\n\nThanks,\nGreg\n"}}]}}}}
-
-check mail:
- {"Header":{"context":{"_jsns":"urn:zimbra","userAgent":{"name":"ZimbraWebClient - GC42 (Mac)","version":"8.6.0_GA_1169"},"session":{"_content":124909,"id":124909},"notify":{"seq":24},"account":{"_content":"greg@zimbra.com","by":"name"},"csrfToken":"0_1f9ba47d2de9159879371451a6ae15dc3ffa8814"}},"Body":{"SearchRequest":{"_jsns":"urn:zimbraMail","sortBy":"dateDesc","header":[{"n":"List-ID"},{"n":"X-Zimbra-DL"},{"n":"IN-REPLY-TO"}],"tz":{"id":"America/Los_Angeles"},"locale":{"_content":"en_US"},"offset":0,"limit":100,"query":"in:inbox","types":"conversation","recip":"0","fullConversation":1,"needExp":1}}}
- */
