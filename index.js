@@ -5,7 +5,7 @@ var request = require('request');
 var js2xmlparser = require('js2xmlparser');
 var ERR_UNKNOWN = "UNKNOWN";
 var USER_AGENT = "zmsoap";
-getAuthToken = function(hostName,adminLogin,adminPassword,cb) {
+getAdminAuthToken = function(hostName,adminLogin,adminPassword,cb) {
     var adminURL = getAdminURL(hostName);
     var authRequestObject = {
         "AuthRequest": {
@@ -20,6 +20,52 @@ getAuthToken = function(hostName,adminLogin,adminPassword,cb) {
     request({
             method:"POST",
             uri:adminURL,
+            headers: {
+                "Content-Type": "application/soap+xml; charset=utf-8"
+            },
+            body: req,
+            strictSSL: false,
+            jar: false,
+            timeout: 10000
+        },
+        function(err,resp,body) {
+            if(err != null) {
+                cb(err,null);
+            } else {
+
+                var result = processResponse(body);
+                if(result.err != null) {
+                    cb(err,null);
+                } else if(result.payload.Body.AuthResponse != null) {
+                    cb(null,result.payload.Body.AuthResponse.authToken[0]._content);
+                } else {
+                    cb({"message":"Error: could node parse response from Zimbra ","resp":resp,"body":body});
+                }
+            }
+
+        });
+}
+
+getUserAuthToken = function(hostName,login,password,cb) {
+    var soapURL = getUserSoapURL(hostName);
+    var authRequestObject = {
+        "AuthRequest": {
+            "@": {
+                "xmlns": "urn:zimbraAccount"
+            },
+            account: {
+                "@":{
+                    "by":"name"
+                },
+                "#":login
+            },
+            password: password
+        }
+    };
+    var req = makeSOAPEnvelope(authRequestObject,"",USER_AGENT);
+    request({
+            method:"POST",
+            uri:soapURL,
             headers: {
                 "Content-Type": "application/soap+xml; charset=utf-8"
             },
@@ -129,6 +175,61 @@ adminRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
         });
 }
 
+getUserAuthTokenByName = function(hostName, login, seconds, adminAuthToken, cb) {
+    delegateAuth(hostname, "name", login, seconds, adminAuthToken, cb);
+}
+
+getUserAuthTokenById = function(hostName, id, seconds, adminAuthToken, cb) {
+    delegateAuth(hostname, "id", id, seconds, adminAuthToken, cb);
+}
+
+delegateAuth = function(hostName, by, val, seconds, adminAuthToken, cb) {
+    var adminURL = getAdminURL(hostName);
+    var delegateAuthObj = {
+        "DelegateAuthRequest":{
+            "@":{
+                "xmlns":"urn:zimbraAdmin",
+                "duration":seconds
+            },
+            "account":{
+                "@":{
+                    "by":by
+                },
+                "#":val
+            }
+        }
+    };
+    var req = makeSOAPEnvelope(delegateAuthObj,adminAuthToken,USER_AGENT);
+    request({
+            method:"POST",
+            uri:adminURL,
+            headers: {
+                "Content-Type": "application/soap+xml; charset=utf-8"
+            },
+            body: req,
+            strictSSL: false,
+            jar: true,
+            timeout: 10000
+        },
+        function(err,resp,body) {
+            if(err != null) {
+                cb(err,null);
+            } else {
+
+                var result = processResponse(body);
+                if(result.err != null) {
+                    cb(result.err,null);
+                } else if(result.payload.Body["DelegateAuthResponse"] != null
+                    && result.payload.Body["DelegateAuthResponse"].authToken != null) {
+                    cb(null,result.payload.Body["DelegateAuthResponse"].authToken);
+                } else {
+                    cb({"message":"Error: could node parse response from Zimbra ","resp":resp,"body":body,code:ERR_UNKNOWN}, null);
+                }
+            }
+
+        });
+}
+
 createDomain = function(hostName, domainName, domainAttrs, adminAuthToken, cb) {
     var adminURL = getAdminURL(hostName);
     var createDomainObj = {"CreateDomainRequest":{name:domainName}};
@@ -193,6 +294,10 @@ function getAdminURL(hostName) {
     return "https://" + hostName + ":7071/service/admin/soap";
 }
 
+function getUserSoapURL(hostName) {
+    return "https://" + hostName + "/service/soap";
+}
+
 function makeSOAPEnvelope(requestObject, authToken, userAgent) {
     var soapReq = {
         "@":{
@@ -231,6 +336,4 @@ exports.adminRequest = adminRequest;
 exports.createAccount = createAccount;
 exports.getAuthToken = getAuthToken;
 exports.createDomain = createDomain;
-
-
 
