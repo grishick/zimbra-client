@@ -1,12 +1,10 @@
 {
   "name": "zimbra-client",
   "private": false,
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "NodeJS client for Zimbra SOAP interface",
   "main": "index.js",
   "dependencies": {
-    "google-auth-library": "^0.9.8",
-    "googleapis": "^12.3.0",
     "js2xmlparser": "*",
     "request": "*"
   },
