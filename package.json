@@ -1,19 +1,21 @@
 {
   "name": "zimbra-client",
   "private": false,
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "NodeJS client for Zimbra SOAP interface",
   "main": "index.js",
   "dependencies": {
-    "request": "*",
-    "js2xmlparser": "*"
+    "google-auth-library": "^0.9.8",
+    "googleapis": "^12.3.0",
+    "js2xmlparser": "*",
+    "request": "*"
   },
   "keywords": [
     "zimbra"
   ],
-  "repository" : {
-    "type":    "git",
-    "url":     "git://github.com/grishick/zimbra-client.git"
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/grishick/zimbra-client.git"
   },
   "author": "Greg Solovyev <fiddlestring@gmail.com> (http://widgeterian.com)",
   "license": "APACHE LICENSE, VERSION 2.0"
