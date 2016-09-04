@@ -145,7 +145,7 @@ createAccount = function(hostName, user, adminAuthToken, cb) {
 }
 
 adminRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
-        var adminURL = getAdminURL(hostName);
+    var adminURL = getAdminURL(hostName);
     var wrapperObj = {};
     var responseName = requestName.replace("Request", "Response");
     wrapperObj[requestName] = reqObject;
@@ -157,7 +157,7 @@ adminRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
             wrapperObj[requestName]["@"][attrname] = defaultRequestAttribute[attrname];
         }
     }else{
-         wrapperObj[requestName]["@"] = defaultRequestAttribute;
+        wrapperObj[requestName]["@"] = defaultRequestAttribute;
     }
 
     request({
@@ -329,6 +329,8 @@ searchAppointments = function(hostName, authToken, folderID, start, end, cb) {
     if(end != null) {
         searchReqObj["SearchRequest"]["@"]["calExpandInstEnd"] = end;
     }
+    searchReqObj["SearchRequest"]["@"]["fetch"] = "all";
+    searchReqObj["SearchRequest"]["@"]["limit"] = 100;
     var req = makeSOAPEnvelope(searchReqObj, authToken, USER_AGENT);
     //console.log(req);
     request({
@@ -433,4 +435,3 @@ exports.getUserAuthToken = getUserAuthToken;
 exports.getFolder = getFolder;
 exports.getCalendars = getCalendars;
 exports.searchAppointments = searchAppointments;
-
