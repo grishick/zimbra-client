@@ -320,7 +320,7 @@ getCalendars = function(hostName, authToken, cb) {
     });
 }
 
-searchAppointments = function(hostName, authToken, folderID, start, end, cb) {
+searchAppointments = function(hostName, authToken, folderID, start, end, limit, cb) {
     var soapURL = getUserSoapURL(hostName);
     var searchReqObj = {"SearchRequest":{"@":{"xmlns":"urn:zimbraMail","types":ITEM_TYPE_APPOINTMENT},"query":"inid:" + folderID}};
     if(start != null) {
@@ -330,7 +330,15 @@ searchAppointments = function(hostName, authToken, folderID, start, end, cb) {
         searchReqObj["SearchRequest"]["@"]["calExpandInstEnd"] = end;
     }
     searchReqObj["SearchRequest"]["@"]["fetch"] = "all";
-    searchReqObj["SearchRequest"]["@"]["limit"] = 100;
+
+    if(typeof (limit) == "function") {
+        cb = limit;
+        limit = 100;
+    } else if(!limit) {
+        limit = 100;
+    }
+
+    searchReqObj["SearchRequest"]["@"]["limit"] = limit;
     var req = makeSOAPEnvelope(searchReqObj, authToken, USER_AGENT);
     //console.log(req);
     request({
@@ -348,6 +356,42 @@ searchAppointments = function(hostName, authToken, folderID, start, end, cb) {
             responseCallback(err, resp, body, "SearchResponse", cb);
         });
 }
+
+getMessage = function(hostName, authToken, messageId, html, ridZ, cb) {
+    var soapURL = getUserSoapURL(hostName);
+    var getMsgReqObj = {"GetMsgRequest":{"@":{"xmlns":"urn:zimbraMail"},"m":{"id":messageId}}};
+    if(typeof (html) == "function") {
+        cb = html;
+        html = 0;
+        ridZ = null;
+    } else if(typeof(ridZ) == "function") {
+        cb = ridZ;
+        ridZ = null;
+    }
+
+    if(ridZ) {
+        getMsgReqObj.GetMsgRequest.m.ridZ = ridZ;
+    }
+    if(html) {
+        getMsgReqObj.GetMsgRequest.m.html = html;
+    }
+    var req = makeSOAPEnvelope(getMsgReqObj, authToken, USER_AGENT);
+    //console.log(req);
+    request({
+            method:"POST",
+            uri:soapURL,
+            headers: {
+                "Content-Type": "application/soap+xml; charset=utf-8"
+            },
+            body: req,
+            strictSSL: false,
+            jar: false,
+            timeout: 10000
+        },
+        function(err,resp,body) {
+            responseCallback(err, resp, body, "GetMsgResponse", cb);
+        });
+};
 
 function responseCallback(err, resp, body, respName, cb) {
     if(err != null) {
@@ -435,3 +479,4 @@ exports.getUserAuthToken = getUserAuthToken;
 exports.getFolder = getFolder;
 exports.getCalendars = getCalendars;
 exports.searchAppointments = searchAppointments;
+exports.getMessage = getMessage;
