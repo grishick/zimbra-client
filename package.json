@@ -1,12 +1,13 @@
 {
   "name": "zimbra-client",
   "private": false,
-  "version": "0.0.7",
+  "version": "0.0.10",
   "description": "NodeJS client for Zimbra SOAP interface",
   "main": "index.js",
   "dependencies": {
     "js2xmlparser": "*",
-    "request": "*"
+    "request": "*",
+    "xml2js":"*"
   },
   "keywords": [
     "zimbra"
@@ -14,6 +15,9 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/grishick/zimbra-client.git"
+  },
+  "scripts": {
+    "test": "node_modules/.bin/mocha"
   },
   "author": "Greg Solovyev <fiddlestring@gmail.com> (http://widgeterian.com)",
   "license": "APACHE LICENSE, VERSION 2.0"
