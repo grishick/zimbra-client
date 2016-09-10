@@ -1,5 +1,5 @@
 #  zimbra-client #
-<img src="https://api.travis-ci.org/grishick/zimbra-client.svg"/>
+<img src="https://api.travis-ci.org/grishick/zimbra-client.svg"/> <img src="https://david-dm.org/grishick/zimbra-client.svg"/>
 ## Overview ##
 zimbra-client is a Node.js module that implements a SOAP client for Zimbra SOAP API
 
