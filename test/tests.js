@@ -1,27 +1,6 @@
 /**
  * Created by gsolovyev on 9/9/16.
  */
-/*
-zimbra = require("../index.js");
-var fs = require('fs');
-var readline = require('readline');
-
-var zimbraURL = process.argv[2];
-var zimbraLogin = process.argv[3];
-var zimbraPassword = process.argv[4];
-zimbra.getUserAuthToken(zimbraURL, zimbraLogin, zimbraPassword, function(err, authToken) {
-    if(err != null) {
-        console.log("Failed to authenticate to Zimbra");
-        console.log(err);
-    } else {
-        zimbra.getCalendars(zimbraURL, authToken, function (err, calendars) {
-            for(var i in calendars) {
-                console.log(calendars[i].name);
-            }
-
-        })
-    }
-    })*/
 
 var assert = require('assert');
 describe('zimbra', function() {
