@@ -312,17 +312,37 @@ getFolder = function(hostName, authToken, rootFolderID, viewConstraint, cb) {
         });
 }
 
-getCalendars = function(hostName, authToken, cb) {
-    getFolder(hostName, authToken, ID_FOLDER_USER_ROOT, ITEM_TYPE_APPOINTMENT, function(err, resp) {
-        if(err != null) {
-            cb(err, null);
-        } else {
-            if (resp && resp.folder && resp.folder.length > 0 && resp.folder[0] && resp.folder[0].folder) {
-                var subfolders = resp.folder[0].folder;
-                cb(null, subfolders);
+parseFolders = function(respBody, cb) {
+    var calendars = [];
+    if (respBody && respBody.folder && respBody.folder.length > 0 && respBody.folder[0]) {
+        if(respBody.folder[0].folder) {
+            var subfolders = respBody.folder[0].folder;
+            for(var i in subfolders ) {
+                calendars.push(subfolders[i]);
+                if(subfolders[i].folder) {
+                    for(var j in subfolders[i].folder) {
+                        calendars.push(subfolders[i].folder[j]);
+                    }
+                }
             }
         }
-    });
+        if(respBody.folder[0].link) {
+            var subfolders = respBody.folder[0].link;
+            for(var i in subfolders ) {
+                calendars.push(subfolders[i]);
+            }
+        }
+        cb(null, calendars);
+    }
+}
+getCalendars = function(hostName, authToken, cb) {
+    getFolder(hostName, authToken, ID_FOLDER_USER_ROOT, ITEM_TYPE_APPOINTMENT, function(err, resp) {
+         if(err != null) {
+            cb(err, null);
+         } else {
+             parseFolders(resp, cb);
+         }
+     });
 }
 
 searchAppointments = function(hostName, authToken, folderID, start, end, limit, cb) {
@@ -402,7 +422,6 @@ function responseCallback(err, resp, body, respName, cb) {
     if(err) {
         cb(err,null);
     } else {
-
         processResponse(body, function(result) {
             if(result.err) {
                 cb(result.err,null);
@@ -433,6 +452,7 @@ function processJSONResponse(respJSON, cb) {
 }
 
 function processXMLResponse(body, cb) {
+    var errcode = ERR_UNKNOWN;
     var parser = require('xml2js');
     parser.parseString(body, {
         tagNameProcessors: [parser.processors.stripPrefix],
@@ -480,7 +500,7 @@ function processBadJSONResponse(body, cb) {
 }
 
 function processResponse(body, cb) {
-    var errcode = ERR_UNKNOWN;
+    //console.log(body);
     try {
         var respJSON = JSON.parse(body);
         if(respJSON != null) {
@@ -503,7 +523,7 @@ function getUserSoapURL(hostName) {
     return "https://" + hostName + "/service/soap";
 }
 
-function makeSOAPEnvelope(requestObject, authToken, userAgent) {
+function makeSOAPEnvelope(requestObject, authToken, userAgent, session) {
     var soapReq = {
         "@":{
             "xmlns:soap":"http://www.w3.org/2003/05/soap-envelope"
@@ -519,7 +539,7 @@ function makeSOAPEnvelope(requestObject, authToken, userAgent) {
                         "name":userAgent
                     }
                 },
-                "nosession":"",
+
                 "format":{
                     "@":{
                         "xmlns":"",
@@ -530,6 +550,11 @@ function makeSOAPEnvelope(requestObject, authToken, userAgent) {
         },
         "soap:Body":requestObject
     };
+    if(!session) {
+        soapReq["soap:Header"].context.nosession = "";
+    } else {
+        soapReq["soap:Header"].context.session = "";
+    }
     return js2xmlparser("soap:Envelope",soapReq);
 }
 
@@ -550,3 +575,5 @@ exports.getCalendars = getCalendars;
 exports.searchAppointments = searchAppointments;
 exports.getMessage = getMessage;
 exports.processResponse = processResponse;
+exports.parseFolders = parseFolders;
+exports.responseCallback = responseCallback;
