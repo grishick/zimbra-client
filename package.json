@@ -1,13 +1,16 @@
 {
   "name": "zimbra-client",
   "private": false,
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "NodeJS client for Zimbra SOAP interface",
   "main": "index.js",
   "dependencies": {
     "js2xmlparser": "*",
     "request": "*",
     "xml2js":"*"
+  },
+  "devDependencies": {
+    "mocha": "*"
   },
   "keywords": [
     "zimbra"
@@ -20,5 +23,11 @@
     "test": "node_modules/.bin/mocha"
   },
   "author": "Greg Solovyev <fiddlestring@gmail.com> (http://widgeterian.com)",
-  "license": "APACHE LICENSE, VERSION 2.0"
+  "license": "APACHE LICENSE, VERSION 2.0",
+  "maintainers": [
+    {
+      "name": "Greg Solovyev",
+      "email": "fiddlestring@gmail.com"
+    }
+  ]
 }

@@ -12,6 +12,7 @@ So far this module supports 5 methods
 * `getFolder`
 * `getCalendars`
 * `searchAppointments`
+* `getMessage`
 
 ## Usage ##
 Following example demonstrates creating a new Zimbra account using zimbra-client. In this example, the code assumes Zimbra is running on localhost, admin username is "admin" and admin password is "test123"
