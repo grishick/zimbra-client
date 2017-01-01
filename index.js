@@ -555,7 +555,7 @@ function makeSOAPEnvelope(requestObject, authToken, userAgent, session) {
     } else {
         soapReq["soap:Header"].context.session = "";
     }
-    return js2xmlparser("soap:Envelope",soapReq);
+    return js2xmlparser.parse("soap:Envelope",soapReq);
 }
 
 /**
