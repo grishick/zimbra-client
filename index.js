@@ -6,6 +6,7 @@ var js2xmlparser = require('js2xmlparser');
 var ERR_UNKNOWN = "UNKNOWN";
 var USER_AGENT = "zmsoap";
 var AUTH_EXPIRED = "service.AUTH_EXPIRED";
+var AUTH_REQUIRED = "service.AUTH_REQUIRED";
 var ID_AUTO_INCREMENT = -1;
 var ID_FOLDER_USER_ROOT = 1;
 var ID_FOLDER_INBOX = 2;
