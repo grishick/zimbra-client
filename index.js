@@ -563,6 +563,7 @@ function makeSOAPEnvelope(requestObject, authToken, userAgent, session) {
  * All module exports are declared below this line
  */
 exports.AUTH_EXPIRED = AUTH_EXPIRED;
+exports.AUTH_REQUIRED = AUTH_REQUIRED;
 exports.ERR_UNKNOWN = ERR_UNKNOWN;
 exports.ROOT_FOLDER_ID = ID_FOLDER_USER_ROOT;
 exports.CALENDAR_FOLDER_ID = ID_FOLDER_CALENDAR;
