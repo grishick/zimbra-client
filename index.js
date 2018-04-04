@@ -159,6 +159,8 @@ adminRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
     }else{
         wrapperObj[requestName]["@"] = defaultRequestAttribute;
     }
+    
+    var req = makeSOAPEnvelope(wrapperObj,adminAuthToken,USER_AGENT);
 
     request({
             method:"POST",
