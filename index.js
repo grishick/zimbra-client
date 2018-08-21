@@ -159,6 +159,55 @@ adminRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
     }else{
         wrapperObj[requestName]["@"] = defaultRequestAttribute;
     }
+
+    var req = makeSOAPEnvelope(wrapperObj,adminAuthToken,USER_AGENT);
+
+    request({
+            method:"POST",
+            uri:adminURL,
+            headers: {
+                "Content-Type": "application/soap+xml; charset=utf-8"
+            },
+            body: req,
+            strictSSL: false,
+            jar: true,
+            timeout: 10000
+        },
+        function(err,resp,body) {
+            if(err != null) {
+                cb(err,null);
+            } else {
+
+                processResponse(body, function(result) {
+                    if(result.err != null) {
+                        cb(result.err,null);
+                    } else if(result.payload.Body[responseName] != null) {
+                        cb(null,result.payload.Body[responseName]);
+                    } else {
+                        cb({"message":"Error: could node parse adminresponse from Zimbra. Expecting " + responseName,"resp":resp,"body":body,code:ERR_UNKNOWN}, null);
+                    }
+                });
+
+            }
+
+        });
+}
+
+adminRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
+    var adminURL = getAdminURL(hostName);
+    var wrapperObj = {};
+    var responseName = requestName.replace("Request", "Response");
+    wrapperObj[requestName] = reqObject;
+
+    var defaultRequestAttribute = { "xmlns": "urn:zimbraAdmin" };
+
+    if (wrapperObj[requestName]["@"]) {
+        for (var attrname in defaultRequestAttribute) {
+            wrapperObj[requestName]["@"][attrname] = defaultRequestAttribute[attrname];
+        }
+    }else{
+        wrapperObj[requestName]["@"] = defaultRequestAttribute;
+    }
     
     var req = makeSOAPEnvelope(wrapperObj,adminAuthToken,USER_AGENT);
 
@@ -570,6 +619,7 @@ exports.ERR_UNKNOWN = ERR_UNKNOWN;
 exports.ROOT_FOLDER_ID = ID_FOLDER_USER_ROOT;
 exports.CALENDAR_FOLDER_ID = ID_FOLDER_CALENDAR;
 exports.adminRequest = adminRequest;
+exports.mailRequest = mailRequest;
 exports.createAccount = createAccount;
 exports.getAdminAuthToken = getAdminAuthToken;
 exports.createDomain = createDomain;
