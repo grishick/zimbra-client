@@ -144,13 +144,13 @@ createAccount = function(hostName, user, adminAuthToken, cb) {
         });
 }
 
-adminRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
+mailRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
     var adminURL = getAdminURL(hostName);
     var wrapperObj = {};
     var responseName = requestName.replace("Request", "Response");
     wrapperObj[requestName] = reqObject;
 
-    var defaultRequestAttribute = { "xmlns": "urn:zimbraAdmin" };
+    var defaultRequestAttribute = { "xmlns": "urn:zimbraMail" };
 
     if (wrapperObj[requestName]["@"]) {
         for (var attrname in defaultRequestAttribute) {
@@ -161,7 +161,6 @@ adminRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
     }
 
     var req = makeSOAPEnvelope(wrapperObj,adminAuthToken,USER_AGENT);
-
     request({
             method:"POST",
             uri:adminURL,
@@ -184,12 +183,10 @@ adminRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
                     } else if(result.payload.Body[responseName] != null) {
                         cb(null,result.payload.Body[responseName]);
                     } else {
-                        cb({"message":"Error: could node parse adminresponse from Zimbra. Expecting " + responseName,"resp":resp,"body":body,code:ERR_UNKNOWN}, null);
+                        cb({"message":"Error: could node parse mailresponse from Zimbra. Expecting " + responseName,"resp":resp,"body":body,code:ERR_UNKNOWN}, null);
                     }
                 });
-
             }
-
         });
 }
 
