@@ -1,13 +1,13 @@
 {
   "name": "zimbra-client",
   "private": false,
-  "version": "0.0.16",
+  "version": "0.1.0",
   "description": "NodeJS client for Zimbra SOAP interface",
   "main": "index.js",
   "dependencies": {
     "js2xmlparser": "*",
     "request": "*",
-    "xml2js":"*"
+    "xml2js": "*"
   },
   "devDependencies": {
     "mocha": "*"
