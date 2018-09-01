@@ -8,6 +8,7 @@ So far this module supports 5 methods
 * `getAdminAuthToken`
 * `createAccount`
 * `adminRequest`
+* `mailRequest`
 * `createDomain`
 * `getUserAuthToken`
 * `getFolder`
