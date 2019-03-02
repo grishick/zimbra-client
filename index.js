@@ -536,6 +536,66 @@ const getPrefTimeZone = function (hostName, authToken, cb)  {
         });
 }
 
+const getUnreadMails = function(hostName, authToken, limit, cb) {
+    var soapURL = getUserSoapURL(hostName);
+    var searchReqObj = {"SearchRequest":{"@":{"xmlns":"urn:zimbraMail"},"query":"is:unread"}};
+
+    searchReqObj["SearchRequest"]["@"]["limit"] = limit;
+    searchReqObj["SearchRequest"]["@"]["types"] = "message";
+
+    var req = makeSOAPEnvelope(searchReqObj, authToken, USER_AGENT);
+    request({
+        method:"POST",
+        uri:soapURL,
+        headers: {
+            "Content-Type": "application/soap+xml; charset=utf-8"
+        },
+        body: req,
+        strictSSL: false,
+        jar: false,
+        timeout: 10000
+    },
+    function(err,resp,body) {
+        responseCallback(err, resp, body, "SearchResponse", cb);
+    });
+}
+
+const sendMessage = function(hostName, authToken, to, subject, data, cb) {
+    var soapURL = getUserSoapURL(hostName);
+    var searchReqObj ={"SendMsgRequest": {
+      "m": {
+                "e": {
+                    "@":{"a": to,
+                    "t": "t"
+                    }
+                },
+                "su": subject,
+                "mp": {
+                    "@":{"ct": "text/plain"},
+                    "content": data
+                }
+            },
+            "@":{ "xmlns": "urn:zimbraMail" }
+        }
+    };
+
+    var req = makeSOAPEnvelope(searchReqObj, authToken, USER_AGENT);
+    request({
+        method:"POST",
+        uri:soapURL,
+        headers: {
+            "Content-Type": "application/soap+xml; charset=utf-8"
+        },
+        body: req,
+        strictSSL: false,
+        jar: false,
+        timeout: 10000
+    },
+    function(err,resp,body) {
+        responseCallback(err, resp, body, "SendMsgResponse", cb);
+    });
+};
+
 function responseCallback(err, resp, body, respName, cb) {
     if(err) {
         cb(err,null);
@@ -699,3 +759,5 @@ exports.parseFolders = parseFolders;
 exports.getPrefTimeZone=getPrefTimeZone;
 exports.createAppointment=createAppointment;
 exports.responseCallback = responseCallback;
+exports.getUnreadMails = getUnreadMails;
+exports.sendMessage = sendMessage;
