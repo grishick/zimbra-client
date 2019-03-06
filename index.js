@@ -21,7 +21,7 @@ var ID_FOLDER_CALENDAR = 10;
 var ID_FOLDER_ROOT = 11;
 var ITEM_TYPE_APPOINTMENT = 'appointment';
 
-getAdminAuthToken = function(hostName,adminLogin,adminPassword,cb) {
+const getAdminAuthToken = function(hostName,adminLogin,adminPassword,cb) {
     var adminURL = getAdminURL(hostName);
     var authRequestObject = {
         "AuthRequest": {
@@ -61,7 +61,7 @@ getAdminAuthToken = function(hostName,adminLogin,adminPassword,cb) {
         });
 }
 
-getUserAuthToken = function(hostName,login,password,cb) {
+const getUserAuthToken = function(hostName,login,password,cb) {
     var soapURL = getUserSoapURL(hostName);
     var authRequestObject = {
         "AuthRequest": {
@@ -107,7 +107,7 @@ getUserAuthToken = function(hostName,login,password,cb) {
         });
 }
 
-createAccount = function(hostName, user, adminAuthToken, cb) {
+const createAccount = function(hostName, user, adminAuthToken, cb) {
     var adminURL = getAdminURL(hostName);
     var createAccountRequestObj = {
         "CreateAccountRequest":user
@@ -144,7 +144,7 @@ createAccount = function(hostName, user, adminAuthToken, cb) {
         });
 }
 
-mailRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
+const mailRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
     var adminURL = getAdminURL(hostName);
     var wrapperObj = {};
     var responseName = requestName.replace("Request", "Response");
@@ -190,7 +190,7 @@ mailRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
         });
 }
 
-adminRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
+const adminRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
     var adminURL = getAdminURL(hostName);
     var wrapperObj = {};
     var responseName = requestName.replace("Request", "Response");
@@ -239,15 +239,15 @@ adminRequest = function(hostName, requestName, reqObject, adminAuthToken, cb) {
         });
 }
 
-getUserAuthTokenByName = function(hostName, login, seconds, adminAuthToken, cb) {
+const getUserAuthTokenByName = function(hostName, login, seconds, adminAuthToken, cb) {
     delegateAuth(hostname, "name", login, seconds, adminAuthToken, cb);
 }
 
-getUserAuthTokenById = function(hostName, id, seconds, adminAuthToken, cb) {
+const getUserAuthTokenById = function(hostName, id, seconds, adminAuthToken, cb) {
     delegateAuth(hostname, "id", id, seconds, adminAuthToken, cb);
 }
 
-delegateAuth = function(hostName, by, val, seconds, adminAuthToken, cb) {
+const delegateAuth = function(hostName, by, val, seconds, adminAuthToken, cb) {
     var adminURL = getAdminURL(hostName);
     var delegateAuthObj = {
         "DelegateAuthRequest":{
@@ -296,7 +296,7 @@ delegateAuth = function(hostName, by, val, seconds, adminAuthToken, cb) {
         });
 }
 
-createDomain = function(hostName, domainName, domainAttrs, adminAuthToken, cb) {
+const createDomain = function(hostName, domainName, domainAttrs, adminAuthToken, cb) {
     var adminURL = getAdminURL(hostName);
     var createDomainObj = {"CreateDomainRequest":{name:domainName}};
     createDomainObj.CreateDomainRequest["@"] = {"xmlns": "urn:zimbraAdmin"};
@@ -340,8 +340,7 @@ createDomain = function(hostName, domainName, domainAttrs, adminAuthToken, cb) {
         });
 }
 
-
-getFolder = function(hostName, authToken, rootFolderID, viewConstraint, cb) {
+const getFolder = function(hostName, authToken, rootFolderID, viewConstraint, cb) {
     var soapURL = getUserSoapURL(hostName);
     var getFolderObj = {"GetFolderRequest":{"@":{"xmlns":"urn:zimbraMail", "view":viewConstraint},"folder":{"@":{"l":rootFolderID}}}};
     var req = makeSOAPEnvelope(getFolderObj, authToken, USER_AGENT);
@@ -361,7 +360,7 @@ getFolder = function(hostName, authToken, rootFolderID, viewConstraint, cb) {
         });
 }
 
-parseFolders = function(respBody, cb) {
+const parseFolders = function(respBody, cb) {
     var calendars = [];
     if (respBody && respBody.folder && respBody.folder.length > 0 && respBody.folder[0]) {
         if(respBody.folder[0].folder) {
@@ -384,7 +383,7 @@ parseFolders = function(respBody, cb) {
         cb(null, calendars);
     }
 }
-getCalendars = function(hostName, authToken, cb) {
+const getCalendars = function(hostName, authToken, cb) {
     getFolder(hostName, authToken, ID_FOLDER_USER_ROOT, ITEM_TYPE_APPOINTMENT, function(err, resp) {
          if(err != null) {
             cb(err, null);
@@ -394,7 +393,7 @@ getCalendars = function(hostName, authToken, cb) {
      });
 }
 
-searchAppointments = function(hostName, authToken, folderID, start, end, limit, cb) {
+const searchAppointments = function(hostName, authToken, folderID, start, end, limit, cb) {
     var soapURL = getUserSoapURL(hostName);
     var searchReqObj = {"SearchRequest":{"@":{"xmlns":"urn:zimbraMail","types":ITEM_TYPE_APPOINTMENT},"query":"inid:" + folderID}};
     if(start != null) {
@@ -431,7 +430,7 @@ searchAppointments = function(hostName, authToken, folderID, start, end, limit, 
         });
 }
 
-getMessage = function(hostName, authToken, messageId, html, ridZ, cb) {
+const getMessage = function(hostName, authToken, messageId, html, ridZ, cb) {
     var soapURL = getUserSoapURL(hostName);
     var getMsgReqObj = {"GetMsgRequest":{"@":{"xmlns":"urn:zimbraMail"},"m":{"id":messageId}}};
     if(typeof (html) == "function") {
@@ -465,6 +464,136 @@ getMessage = function(hostName, authToken, messageId, html, ridZ, cb) {
         function(err,resp,body) {
             responseCallback(err, resp, body, "GetMsgResponse", cb);
         });
+};
+
+const createAppointment = function(hostName, authToken, userEmail, start, end,  subject, content, loc, tz, cb) {
+    // console.log(hostName, authToken, userEmail, start, end,  subject, content, loc, tz);
+    var soapURL = getUserSoapURL(hostName);
+    var searchReqObj =  {"CreateAppointmentRequest": {
+        "@":{"xmlns":"urn:zimbraMail"},
+        "m": {
+           "inv": {
+              "comp": {
+                 "@": { "status": "CONF",
+                 "fb": "B",
+                 "transp": "O",
+                 "allDay": "0",
+                 "name": subject,
+                 "loc": loc
+                 },
+                 "s": {
+                    "@" : {"d": start, "tz": tz}
+                 },
+                 "e": {
+                    "@": {"d": end, "tz": tz}
+                 },
+                 "or": {
+                    "@" : {"a": userEmail }
+                 }
+              }
+           },
+           "su": subject,
+           "mp": {
+              "@": {"ct": "text/plain"},
+              "content": content
+           }
+        }
+     }};
+    var req = makeSOAPEnvelope(searchReqObj, authToken, USER_AGENT);
+    request({
+            method:"POST",
+            uri:soapURL,
+            headers: {
+                "Content-Type": "application/soap+xml; charset=utf-8"
+            },
+            body: req,
+            strictSSL: false,
+            jar: false,
+            timeout: 10000
+        },
+        function(err,resp,body) {
+            responseCallback(err, resp, body, "CreateAppointmentResponse", cb);
+        });
+}
+
+const getPrefTimeZone = function (hostName, authToken, cb)  {
+    var soapURL = getUserSoapURL(hostName);
+    var getFolderObj = {"GetPrefsRequest":{"@":{"xmlns":"urn:zimbraAccount"}, "pref": {"@":{"name":"zimbraPrefTimeZoneId"}} }};
+    var req = makeSOAPEnvelope(getFolderObj, authToken, USER_AGENT);
+    request({
+            method:"POST",
+            uri:soapURL,
+            headers: {
+                "Content-Type": "application/soap+xml; charset=utf-8"
+            },
+            body: req,
+            strictSSL: false,
+            jar: false,
+            timeout: 10000
+        },
+        function(err,resp,body) {
+            responseCallback(err, resp, body, "GetPrefsResponse", cb);
+        });
+}
+
+const getUnreadMails = function(hostName, authToken, limit, cb) {
+    var soapURL = getUserSoapURL(hostName);
+    var searchReqObj = {"SearchRequest":{"@":{"xmlns":"urn:zimbraMail"},"query":"is:unread"}};
+
+    searchReqObj["SearchRequest"]["@"]["limit"] = limit;
+    searchReqObj["SearchRequest"]["@"]["types"] = "message";
+
+    var req = makeSOAPEnvelope(searchReqObj, authToken, USER_AGENT);
+    request({
+        method:"POST",
+        uri:soapURL,
+        headers: {
+            "Content-Type": "application/soap+xml; charset=utf-8"
+        },
+        body: req,
+        strictSSL: false,
+        jar: false,
+        timeout: 10000
+    },
+    function(err,resp,body) {
+        responseCallback(err, resp, body, "SearchResponse", cb);
+    });
+}
+
+const sendMessage = function(hostName, authToken, to, subject, data, cb) {
+    var soapURL = getUserSoapURL(hostName);
+    var searchReqObj ={"SendMsgRequest": {
+      "m": {
+                "e": {
+                    "@":{"a": to,
+                    "t": "t"
+                    }
+                },
+                "su": subject,
+                "mp": {
+                    "@":{"ct": "text/plain"},
+                    "content": data
+                }
+            },
+            "@":{ "xmlns": "urn:zimbraMail" }
+        }
+    };
+
+    var req = makeSOAPEnvelope(searchReqObj, authToken, USER_AGENT);
+    request({
+        method:"POST",
+        uri:soapURL,
+        headers: {
+            "Content-Type": "application/soap+xml; charset=utf-8"
+        },
+        body: req,
+        strictSSL: false,
+        jar: false,
+        timeout: 10000
+    },
+    function(err,resp,body) {
+        responseCallback(err, resp, body, "SendMsgResponse", cb);
+    });
 };
 
 function responseCallback(err, resp, body, respName, cb) {
@@ -627,4 +756,8 @@ exports.searchAppointments = searchAppointments;
 exports.getMessage = getMessage;
 exports.processResponse = processResponse;
 exports.parseFolders = parseFolders;
+exports.getPrefTimeZone=getPrefTimeZone;
+exports.createAppointment=createAppointment;
 exports.responseCallback = responseCallback;
+exports.getUnreadMails = getUnreadMails;
+exports.sendMessage = sendMessage;
